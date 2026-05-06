@@ -16,7 +16,10 @@ from mlx_lm import stream_generate as mlx_stream_generate
 
 
 MODEL_NAME = "microsoft/phi-2"
-ADAPTER_PATH = os.path.expanduser("~/ml-experiment/experiments/2026-05-04-0014")
+ADAPTER_PATH = os.environ.get(
+    "ADAPTER_PATH",
+    os.path.expanduser("~/ml-experiment/experiments/2026-05-04-0014"),
+)
 
 
 class _ModelSingleton:
