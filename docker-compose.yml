@@ -7,8 +7,5 @@ services:
       - "8000:8000"
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
-      - ~/ml-experiment/experiments:/experiments
       - ./logs:/app/logs
-    environment:
-      ADAPTER_PATH: /experiments/2026-05-04-0014
     restart: unless-stopped

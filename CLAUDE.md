@@ -76,8 +76,12 @@
   `/model/info`.
 
 ## Adapter path configuration
-- Currently hard-coded as `~/ml-experiment/experiments/2026-05-04-0014`
-  in `app/model.py`. To make it configurable, read it from an
-  environment variable (e.g. `PHI2_ADAPTER_PATH`) with the current
-  value as the default. Same for `MODEL_NAME` if you want to switch
-  base models without code changes.
+- Read from the `ADAPTER_PATH` environment variable in `app/model.py`
+  and `app/model_torch.py`, defaulting to
+  `~/ml-experiment/experiments/2026-05-04-0014`. Override it to point at
+  a different adapter without editing code. `MODEL_NAME` is still a
+  module-level constant; give it the same treatment if you want to swap
+  base models via the environment too.
+- The adapter is MLX-format, so only the MLX backend (`app/model.py`)
+  applies it. The PyTorch backend (`app/model_torch.py`) ignores it and
+  always serves base Phi-2.

@@ -1,4 +1,4 @@
-"""FastAPI app for serving the fine-tuned Phi-2 model on the PyTorch backend.
+"""FastAPI app for serving base Phi-2 on the PyTorch backend.
 
 Identical to `app.main` except it imports `app.model_torch` (HuggingFace
 Transformers + PyTorch) instead of `app.model` (MLX). Use this entry

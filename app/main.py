@@ -1,4 +1,7 @@
-"""FastAPI app for serving the fine-tuned Phi-2 model.
+"""FastAPI app for serving Phi-2 (MLX backend).
+
+Serves base Phi-2, or the fine-tuned model when the MLX LoRA adapter is
+present (see `app/model.py`).
 
 Wires together:
 - a lifespan event that loads the MLX model once at startup,
