@@ -228,8 +228,13 @@ phi2-serving/
 ├── requirements.txt          # native macOS / MLX dependencies
 ├── requirements-linux.txt    # Docker / PyTorch dependencies
 ├── README.md
-└── CLAUDE.md                 # architecture decisions & extension notes
+├── CLAUDE.md                 # architecture decisions & extension notes
+└── LICENSE
 ```
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ## Acknowledgements
 
