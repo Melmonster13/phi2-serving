@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # Covers requirements.txt (MLX) and requirements-linux.txt (Docker)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      python-deps:
+        patterns: ["*"]
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
