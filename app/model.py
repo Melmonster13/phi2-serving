@@ -13,6 +13,7 @@ from typing import Generator, Optional
 
 from mlx_lm import load, generate as mlx_generate
 from mlx_lm import stream_generate as mlx_stream_generate
+from mlx_lm.tokenizer_utils import BPEStreamingDetokenizer
 
 
 MODEL_NAME = "microsoft/phi-2"
@@ -20,6 +21,21 @@ ADAPTER_PATH = os.environ.get(
     "ADAPTER_PATH",
     os.path.expanduser("~/ml-experiment/experiments/2026-05-04-0014"),
 )
+
+
+class _KeepLeadingSpaceDetokenizer(BPEStreamingDetokenizer):
+    """Keep the completion's leading space, matching the PyTorch backend.
+
+    mlx_lm strips it on the first token, but a completion continues the
+    prompt ("my name is" + " John"), so the space belongs in the output.
+    """
+
+    def _maybe_trim_space(self, current_text):
+        if self.text or not current_text.startswith(" "):
+            return super()._maybe_trim_space(current_text)
+        if self.clean_spaces and current_text[1:].startswith(self._space_matches):
+            return current_text[1:]
+        return current_text
 
 
 class _ModelSingleton:
@@ -44,6 +60,8 @@ class _ModelSingleton:
         start = time.perf_counter()
         adapter = self.adapter_path if Path(self.adapter_path).exists() else None
         self.model, self.tokenizer = load(self.model_name, adapter_path=adapter)
+        if self.tokenizer._detokenizer_class is BPEStreamingDetokenizer:
+            self.tokenizer._detokenizer_class = _KeepLeadingSpaceDetokenizer
         self.load_time_seconds = time.perf_counter() - start
         self.loaded = True
 
