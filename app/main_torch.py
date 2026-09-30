@@ -5,6 +5,7 @@ Transformers + PyTorch) instead of `app.model` (MLX). Use this entry
 point inside Linux containers where MLX is not available.
 """
 
+import json
 import logging
 import time
 from contextlib import asynccontextmanager
@@ -53,8 +54,6 @@ async def log_requests(request: Request, call_next):
         try:
             body = await request.body()
             request._body = body
-            import json
-
             data = json.loads(body or b"{}")
             prompt_preview = str(data.get("prompt", ""))[:100]
         except Exception:
@@ -108,11 +107,12 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
 
 @app.post("/generate/stream")
 async def generate_stream(req: GenerateRequest):
-    """Stream tokens to the client, newline-separated, as they are produced."""
+    """Stream tokens as NDJSON: one JSON-encoded string per line."""
     _require_loaded()
 
     def iterator():
         for token in model.stream_generate(req.prompt, req.max_tokens):
-            yield token + "\n"
+            if token:
+                yield json.dumps(token) + "\n"
 
-    return StreamingResponse(iterator(), media_type="text/plain")
+    return StreamingResponse(iterator(), media_type="application/x-ndjson")

@@ -109,7 +109,7 @@ with a CUDA GPU, which this CPU-only image does not use.
 | GET    | `/health`           | Liveness probe + model-loaded flag                |
 | GET    | `/model/info`       | Model name, adapter path, load time in seconds    |
 | POST   | `/generate`         | Synchronous completion for a prompt               |
-| POST   | `/generate/stream`  | Streamed tokens, newline-separated                |
+| POST   | `/generate/stream`  | Streamed tokens as NDJSON, one JSON string per line |
 
 `503` is returned when the model isn't loaded; `422` for invalid input.
 
