@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.title="phi2-serving" \
       org.opencontainers.image.description="FastAPI + PyTorch CPU serving API for Phi-2 (base model; MLX LoRA adapter not applied in-container)" \
