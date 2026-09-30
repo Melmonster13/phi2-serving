@@ -4,4 +4,4 @@
 # subsequent requests reuse the in-memory singleton.
 set -euo pipefail
 cd "$(dirname "$0")"
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

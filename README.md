@@ -61,8 +61,12 @@ API surface, two runtimes chosen by where you deploy.
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
+
+If you moved or renamed the project folder after creating `.venv`, its
+scripts still point at the old path and fail with "bad interpreter".
+Recreate it with `python3.11 -m venv --clear .venv`, then reinstall.
 
 ## Run (native macOS / MLX)
 
