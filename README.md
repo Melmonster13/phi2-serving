@@ -105,6 +105,7 @@ with a CUDA GPU, which this CPU-only image does not use.
 
 | Method | Path                | Description                                       |
 | ------ | ------------------- | ------------------------------------------------- |
+| GET    | `/`                 | Browser playground: enter a prompt, read output   |
 | GET    | `/health`           | Liveness probe + model-loaded flag                |
 | GET    | `/model/info`       | Model name, adapter path, load time in seconds    |
 | POST   | `/generate`         | Synchronous completion for a prompt               |

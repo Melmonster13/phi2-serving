@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from app import model_torch as model
 from app.schemas import (
@@ -76,6 +76,12 @@ def _require_loaded() -> None:
     """Raise 503 if the model isn't ready to serve."""
     if not model.is_loaded():
         raise HTTPException(status_code=503, detail="Model not loaded")
+
+
+@app.get("/", include_in_schema=False)
+async def index() -> FileResponse:
+    """Serve the browser playground page."""
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
 @app.get("/health", response_model=HealthResponse)
