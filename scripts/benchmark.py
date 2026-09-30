@@ -2,10 +2,9 @@
 """Measure generation throughput against a running Phi-2 Serving API.
 
 Streams from `/generate/stream`, counts the tokens the server emits, and
-reports tokens/sec plus time-to-first-token. Counting streamed tokens
-gives a real generated-token count that works the same way against either
-backend (MLX or PyTorch CPU), so the two rows in the README are directly
-comparable.
+reports tokens/sec plus time-to-first-token. MLX streams one token per
+line; the PyTorch backend streams whole words, so its count (and tok/s)
+is slightly understated.
 
 Start the server first (`./run.sh` for MLX, or `docker compose up` for
 PyTorch CPU), then run this against it:

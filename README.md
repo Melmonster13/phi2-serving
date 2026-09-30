@@ -138,8 +138,7 @@ curl -N -X POST http://localhost:8000/generate/stream \
 Throughput is measured by `scripts/benchmark.py`, which streams from
 `/generate/stream`, counts the tokens the server emits, and reports the
 median tokens/sec over several runs (the first run is discarded as
-warmup). Counting streamed tokens works identically against both
-backends, so the rows are directly comparable.
+warmup).
 
 With the server running:
 
@@ -147,17 +146,21 @@ With the server running:
 python scripts/benchmark.py --url http://localhost:8000 --label "MLX (native)"
 ```
 
-Measured on an M4 MacBook Pro, prompt `"Hello, my name is"`, median of 3
-runs (both backends emitted the same 15 tokens, so the rows are directly
-comparable):
+Measured on an M4 MacBook Pro, prompt `"Hello, my name is"`,
+`max_tokens` 64, median of 3 runs:
 
 | Backend            | Runtime      | Throughput            | Notes            |
 | ------------------ | ------------ | --------------------- | ---------------- |
-| Native (macOS)     | MLX          | 14.3 tok/s (ttft 189ms) | GPU + Neural Engine via Metal |
-| Docker             | PyTorch CPU  | 1.9 tok/s (ttft 695ms) | CPU only, base Phi-2 |
+| Native (macOS)     | MLX          | 14.8 tok/s (ttft 195ms) | GPU + Neural Engine via Metal |
+| Docker             | PyTorch CPU  | 1.5 tok/s (ttft 536ms) | CPU only, base Phi-2 |
 
-On-device MLX is about 7.5x faster than PyTorch CPU here. The gap would
+On-device MLX is roughly 10x faster than PyTorch CPU here. The gap would
 close on a machine with a CUDA GPU, which this CPU-only image does not use.
+
+The PyTorch figure is slightly understated: MLX streams one token per
+chunk (16 counted), but Hugging Face's `TextIteratorStreamer` groups
+tokens into whole words, so the same request arrives as fewer chunks
+(14 counted).
 
 `/health` and `/model/info` perform no inference and return in single-digit
 milliseconds.
