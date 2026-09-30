@@ -152,15 +152,12 @@ Measured on an M4 MacBook Pro, prompt `"Hello, my name is"`,
 | Backend            | Runtime      | Throughput            | Notes            |
 | ------------------ | ------------ | --------------------- | ---------------- |
 | Native (macOS)     | MLX          | 14.8 tok/s (ttft 195ms) | GPU + Neural Engine via Metal |
-| Docker             | PyTorch CPU  | 1.5 tok/s (ttft 536ms) | CPU only, base Phi-2 |
+| Docker             | PyTorch CPU  | 2.1 tok/s (ttft 468ms) | CPU only, base Phi-2 |
 
-On-device MLX is roughly 10x faster than PyTorch CPU here. The gap would
-close on a machine with a CUDA GPU, which this CPU-only image does not use.
-
-The PyTorch figure is slightly understated: MLX streams one token per
-chunk (16 counted), but Hugging Face's `TextIteratorStreamer` groups
-tokens into whole words, so the same request arrives as fewer chunks
-(14 counted).
+Both backends stream one token per line and emitted the same 16 tokens,
+so the rows are directly comparable. On-device MLX is about 7x faster
+than PyTorch CPU here. The gap would close on a machine with a CUDA GPU,
+which this CPU-only image does not use.
 
 `/health` and `/model/info` perform no inference and return in single-digit
 milliseconds.

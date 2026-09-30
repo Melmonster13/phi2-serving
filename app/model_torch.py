@@ -72,6 +72,24 @@ class _ModelSingleton:
 _state = _ModelSingleton()
 
 
+class _TokenStreamer(TextIteratorStreamer):
+    """Emits text per token, matching MLX, instead of buffering whole words."""
+
+    def put(self, value) -> None:
+        if len(value.shape) > 1:
+            value = value[0]
+        if self.skip_prompt and self.next_tokens_are_prompt:
+            self.next_tokens_are_prompt = False
+            return
+        self.token_cache.extend(value.tolist())
+        text = self.tokenizer.decode(self.token_cache, **self.decode_kwargs)
+        # Hold back a partially decoded multi-byte character until it completes.
+        if text.endswith("�"):
+            return
+        self.on_finalized_text(text[self.print_len :])
+        self.print_len = len(text)
+
+
 def load_model() -> None:
     """Load the model into the module-level singleton (idempotent)."""
     _state.load()
@@ -119,7 +137,7 @@ def stream_generate(prompt: str, max_tokens: int = 256) -> Generator[str, None, 
         raise RuntimeError("Model not loaded")
 
     inputs = _state.tokenizer(prompt, return_tensors="pt")
-    streamer = TextIteratorStreamer(
+    streamer = _TokenStreamer(
         _state.tokenizer, skip_prompt=True, skip_special_tokens=True
     )
 
