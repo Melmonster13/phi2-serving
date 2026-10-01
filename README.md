@@ -49,7 +49,7 @@ API surface, two runtimes chosen by where you deploy.
 - Optional: a LoRA adapter trained in the companion `ml-experiment`
   project. The MLX backend applies it when present; if the adapter
   directory is missing, the base model loads instead. The adapter path
-  defaults to `~/ml-experiment/experiments/2026-05-04-0014` and can be
+  defaults to `~/Developer/ml-experiment/experiments/2026-05-04-0014` and can be
   overridden with the `ADAPTER_PATH` environment variable.
 
   The adapter is stored in MLX format, so it is **only** applied by the

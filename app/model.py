@@ -19,7 +19,7 @@ from mlx_lm.tokenizer_utils import BPEStreamingDetokenizer
 MODEL_NAME = "microsoft/phi-2"
 ADAPTER_PATH = os.environ.get(
     "ADAPTER_PATH",
-    os.path.expanduser("~/ml-experiment/experiments/2026-05-04-0014"),
+    os.path.expanduser("~/Developer/ml-experiment/experiments/2026-05-04-0014"),
 )
 
 

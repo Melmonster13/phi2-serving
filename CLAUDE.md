@@ -78,7 +78,7 @@
 ## Adapter path configuration
 - Read from the `ADAPTER_PATH` environment variable in `app/model.py`
   and `app/model_torch.py`, defaulting to
-  `~/ml-experiment/experiments/2026-05-04-0014`. Override it to point at
+  `~/Developer/ml-experiment/experiments/2026-05-04-0014`. Override it to point at
   a different adapter without editing code. `MODEL_NAME` is still a
   module-level constant; give it the same treatment if you want to swap
   base models via the environment too.
