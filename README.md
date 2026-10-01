@@ -155,13 +155,19 @@ Measured on an M4 MacBook Pro, prompt `"Hello, my name is"`,
 
 | Backend            | Runtime      | Throughput            | Notes            |
 | ------------------ | ------------ | --------------------- | ---------------- |
-| Native (macOS)     | MLX          | 14.8 tok/s (ttft 195ms) | GPU + Neural Engine via Metal |
-| Docker             | PyTorch CPU  | 2.1 tok/s (ttft 468ms) | CPU only, base Phi-2 |
+| Native (macOS)     | MLX          | 16.7 tok/s (ttft 193ms) | Fine-tuned (LoRA adapter), 64 tokens |
+| Native (macOS)     | MLX          | 14.8 tok/s (ttft 195ms) | Base Phi-2, 16 tokens |
+| Docker             | PyTorch CPU  | 2.1 tok/s (ttft 468ms) | Base Phi-2, 16 tokens |
 
-Both backends stream one token per line and emitted the same 16 tokens,
-so the rows are directly comparable. On-device MLX is about 7x faster
-than PyTorch CPU here. The gap would close on a machine with a CUDA GPU,
-which this CPU-only image does not use.
+The two base Phi-2 rows emitted the same 16 tokens, so they are directly
+comparable: on-device MLX is about 7x faster than PyTorch CPU. The gap
+would close on a machine with a CUDA GPU, which this CPU-only image does
+not use.
+
+The fine-tuned model ran to the full 64 tokens instead of stopping at 16,
+which spreads the fixed time-to-first-token over more tokens. Excluding
+that, MLX generates at about 17 tok/s either way, so the adapter adds no
+measurable cost.
 
 `/health` and `/model/info` perform no inference and return in single-digit
 milliseconds.
