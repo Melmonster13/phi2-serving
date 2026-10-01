@@ -43,10 +43,10 @@
 - **`tokens_used` is approximate.** It's `len(text.split())`, not a
   true token count. Switching to `len(tokenizer.encode(text))` would
   fix this at a small CPU cost.
-- **Adapter resolution is silent.** If the LoRA adapter directory is
-  missing, the base model loads with no warning surfaced to the API
-  client. `/model/info` still reports the configured `adapter_path`
-  even when it wasn't actually applied.
+- **A missing adapter doesn't stop startup.** If the LoRA adapter
+  directory is missing, the base model loads and a warning is logged
+  to the server console. Clients can check `adapter_loaded` in
+  `/model/info`; `adapter_path` is always the configured path.
 
 # How to Extend
 

@@ -23,6 +23,7 @@ class ModelInfo(BaseModel):
 
     model_name: str
     adapter_path: str
+    adapter_loaded: bool
     load_time_seconds: float
 
 

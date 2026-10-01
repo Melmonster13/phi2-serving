@@ -6,6 +6,7 @@ from its lifespan event; tests can import this module without paying
 that cost until `load_model()` is called.
 """
 
+import logging
 import os
 import time
 from pathlib import Path
@@ -14,6 +15,9 @@ from typing import Generator, Optional
 from mlx_lm import load, generate as mlx_generate
 from mlx_lm import stream_generate as mlx_stream_generate
 from mlx_lm.tokenizer_utils import BPEStreamingDetokenizer
+
+
+logger = logging.getLogger("uvicorn.error")
 
 
 MODEL_NAME = "microsoft/phi-2"
@@ -47,22 +51,32 @@ class _ModelSingleton:
         self.model_name: str = MODEL_NAME
         self.adapter_path: str = ADAPTER_PATH
         self.load_time_seconds: float = 0.0
+        self.adapter_loaded: bool = False
         self.loaded: bool = False
 
     def load(self) -> None:
         """Load weights + tokenizer once. No-op on subsequent calls.
 
         If the LoRA adapter directory is missing, the base model loads
-        without an adapter so the API still comes up.
+        without an adapter so the API still comes up, and a warning is
+        logged.
         """
         if self.loaded:
             return
         start = time.perf_counter()
         adapter = self.adapter_path if Path(self.adapter_path).exists() else None
+        if adapter is None:
+            logger.warning(
+                "LoRA adapter not found at %s; serving base %s. "
+                "Set ADAPTER_PATH to the adapter directory.",
+                self.adapter_path,
+                self.model_name,
+            )
         self.model, self.tokenizer = load(self.model_name, adapter_path=adapter)
         if self.tokenizer._detokenizer_class is BPEStreamingDetokenizer:
             self.tokenizer._detokenizer_class = _KeepLeadingSpaceDetokenizer
         self.load_time_seconds = time.perf_counter() - start
+        self.adapter_loaded = adapter is not None
         self.loaded = True
 
 
@@ -80,10 +94,11 @@ def is_loaded() -> bool:
 
 
 def get_info() -> dict:
-    """Return model name, adapter path, and load time in seconds."""
+    """Return model name, adapter path and whether it loaded, and load time."""
     return {
         "model_name": _state.model_name,
         "adapter_path": _state.adapter_path,
+        "adapter_loaded": _state.adapter_loaded,
         "load_time_seconds": _state.load_time_seconds,
     }
 

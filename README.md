@@ -111,7 +111,7 @@ with a CUDA GPU, which this CPU-only image does not use.
 | ------ | ------------------- | ------------------------------------------------- |
 | GET    | `/`                 | Browser playground: enter a prompt, read output   |
 | GET    | `/health`           | Liveness probe + model-loaded flag                |
-| GET    | `/model/info`       | Model name, adapter path, load time in seconds    |
+| GET    | `/model/info`       | Model name, adapter path, whether it loaded, load time |
 | POST   | `/generate`         | Synchronous completion for a prompt               |
 | POST   | `/generate/stream`  | Streamed tokens as NDJSON, one JSON string per line |
 
@@ -193,11 +193,12 @@ git-ignored.
   in-domain prompts only, and only on the MLX backend.
 - The adapter is produced by the separate `ml-experiment` project and is
   not vendored here. If its directory is absent, the MLX backend loads
-  base Phi-2 with no error, so serving the fine-tuned model requires the
-  adapter to be present locally (or `ADAPTER_PATH` pointed at it).
+  base Phi-2 and logs a warning, so serving the fine-tuned model requires
+  the adapter to be present locally (or `ADAPTER_PATH` pointed at it).
+  `adapter_loaded` in `/model/info` shows whether it was applied.
 - The Docker/PyTorch backend serves base Phi-2 without the adapter,
-  because the adapter is in MLX format. `/model/info` still reports the
-  configured `adapter_path` even when no adapter was applied.
+  because the adapter is in MLX format. It logs a warning at startup and
+  always reports `adapter_loaded: false`.
 - For a streaming response, the logged `response_time_ms` captures
   time-to-first-byte, not total stream duration, because the middleware
   records elapsed time when the response headers are sent.

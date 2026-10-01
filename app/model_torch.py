@@ -9,6 +9,7 @@ Public interface:
     load_model(), is_loaded(), get_info(), generate(), stream_generate()
 """
 
+import logging
 import os
 import time
 from pathlib import Path
@@ -17,6 +18,9 @@ from typing import Generator
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+
+
+logger = logging.getLogger("uvicorn.error")
 
 
 MODEL_NAME = "microsoft/phi-2"
@@ -40,9 +44,8 @@ class _ModelSingleton:
     def load(self) -> None:
         """Load weights + tokenizer once. No-op on subsequent calls.
 
-        If the LoRA adapter directory exists, it is applied via `peft`.
-        Otherwise the base model is loaded standalone so the API still
-        comes up.
+        Always serves base Phi-2: the LoRA adapter is MLX-format and can't
+        be applied here, so a warning is logged instead.
         """
         if self.loaded:
             return
@@ -63,6 +66,11 @@ class _ModelSingleton:
         # MLX-format adapters are not compatible with peft/PyTorch.
         # The Linux container runs base Phi-2 only.
         self.model = base_model
+        logger.warning(
+            "PyTorch backend can't apply the MLX-format LoRA adapter; "
+            "serving base %s.",
+            self.model_name,
+        )
 
         self.model.eval()
         self.load_time_seconds = time.perf_counter() - start
@@ -101,10 +109,11 @@ def is_loaded() -> bool:
 
 
 def get_info() -> dict:
-    """Return model name, adapter path, and load time in seconds."""
+    """Return model name, adapter path and whether it loaded, and load time."""
     return {
         "model_name": _state.model_name,
         "adapter_path": _state.adapter_path,
+        "adapter_loaded": False,
         "load_time_seconds": _state.load_time_seconds,
     }
 
