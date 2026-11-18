@@ -1,0 +1,4 @@
+title: Phi-2 Serving API
+remote_theme: Melmonster13/synthwave-theme@v1.0.0
+plugins:
+  - jekyll-remote-theme
